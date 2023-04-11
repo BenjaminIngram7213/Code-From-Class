@@ -1,39 +1,4 @@
-(ns clojure-from-class.repl)
-
-;; We want to write this REPL without using eval
-;; eval does 2 primary things:
-;;  1. Evaluates the data structure/code and returns the result.
-;;  2. May define global variables or functions. This results in side effects
-;;     that go beyond the place they are used.
-;;
-;; We will call the storage of bindings to values the *environment*
-
-;; In our eval, we will track the environment in a functional, immutable style
-;; We want no side effects on the actual Clojure global environment
-
-;; Instead, we will store a map containing the environment of symbols and
-;; their bindings.
-
-;; my-eval is going to need to return 2 things:
-;; 1. The result of evaluating the expression
-;; 2. The new environment with any changes to bindings
-
-;; our return will be a "state" that looks like this:
-{:environment {'x 5
-               'length 27.2
-               'numbers '(4 8 12)
-               'square (fn [x] (* x x))
-               'horse "Albert"}
- :return 43}
-
-; We will implement:
-; 1. creating my-eval and calling it in repl
-; 2. integer literals
-; 3. +
-; 4. nested calls to +
-; 5. def
-; 6. defed symbols
-
+(ns hw6.core)
 
 (defn my-eval
   "Evaluates expression, changes environment, and returns resulting state
@@ -54,6 +19,12 @@
       (cond
         (= f '+) (assoc state :return (apply + (map #(:return (my-eval state %))
                                                     args)))
+        (= f '-) (assoc state :return (apply - (map #(:return (my-eval state %))
+                                                    args)))
+        (= f '*) (assoc state :return (apply * (map #(:return (my-eval state %))
+                                                            args)))
+        (= f '/) (assoc state :return (apply / (map #(:return (my-eval state %))
+                                                            args)))
         (= f 'def) {:environment (assoc (:environment state)
                                         (first args)
                                         (:return (my-eval state (second args))))
@@ -79,8 +50,9 @@
   [& args]
   (repl))
 
+
 (comment
-  (main)
-
-
-  )
+  (main) 
+   
+  
+) 
